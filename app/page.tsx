@@ -1,65 +1,471 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+
+const BG_W = 1672;
+const BG_H = 941;
+const FRAME = 180;
+const SCREEN_PADDING = 16;
+
+const clamp = (value: number, min: number, max: number) =>
+  max < min ? (min + max) / 2 : Math.min(Math.max(value, min), max);
+
+// Frames per second — change these to adjust animation speed
+const PRELOAD_IMAGES = [
+  "/assets/sprites/landing/LandingMenu_BG.png",
+  "/assets/sprites/landing/Welcome.png",
+  "/assets/sprites/landing/Click_to_Begin.png",
+  "/assets/sprites/landing/Garden_sign.png",
+  "/assets/sprites/landing/Garden_hover.png",
+  "/assets/sprites/landing/Library_sign.png",
+  "/assets/sprites/landing/Library_hover.png",
+  "/assets/sprites/landing/bailey_log_idle.png",
+  "/assets/sprites/landing/bailey_marshmallow_log.png",
+  "/assets/sprites/landing/jeshua_idle_animation.png",
+  "/assets/sprites/landing/jeshua_look_animation.png",
+  "/assets/sprites/landing/campfire.png",
+  "/assets/sprites/landing/smoke.png",
+];
+
+const FPS = {
+  campfire:          1,
+  smoke:             1,
+  jchengIdle:        2,
+  jchengLook:        2,
+  baileyIdle:        2,
+  baileyMarshmallow: 2,
+};
+
+const cyclems = (fps: number, frames: number) => (frames / fps) * 1000;
+
+// — Bailey —
+const BAILEY_SEQUENCE = ["idle", "idle", "idle", "marshmallow"] as const;
+type BaileyAnim = typeof BAILEY_SEQUENCE[number];
+
+const BAILEY_SPRITE: Record<BaileyAnim, { image: string; bgSize: string; cycleMs: number }> = {
+  idle: {
+    image:   "url('/assets/sprites/landing/bailey_log_idle.png')",
+    bgSize:  `${FRAME * 6}px ${FRAME}px`,
+    cycleMs: cyclems(FPS.baileyIdle, 6),
+  },
+  marshmallow: {
+    image:   "url('/assets/sprites/landing/bailey_marshmallow_log.png')",
+    bgSize:  `${FRAME * 6}px ${FRAME}px`,
+    cycleMs: cyclems(FPS.baileyMarshmallow, 6),
+  },
+};
+
+// — Jcheng —
+const JCHENG_SEQUENCE = ["idle", "idle", "idle", "look"] as const;
+type JchengAnim = typeof JCHENG_SEQUENCE[number];
+
+const JCHENG_SPRITE: Record<JchengAnim, { image: string; bgSize: string; cycleMs: number }> = {
+  idle: {
+    image:   "url('/assets/sprites/landing/jeshua_idle_animation.png')",
+    bgSize:  `${FRAME * 6}px ${FRAME}px`,
+    cycleMs: cyclems(FPS.jchengIdle, 6),
+  },
+  look: {
+    image:   "url('/assets/sprites/landing/jeshua_look_animation.png')",
+    bgSize:  `${FRAME * 6}px ${FRAME}px`,
+    cycleMs: cyclems(FPS.jchengLook, 6),
+  },
+};
+
+export default function LandingPage() {
+  const router = useRouter();
+  const [baileyStep, setBaileyStep] = useState(0);
+  const baileyAnim: BaileyAnim = BAILEY_SEQUENCE[baileyStep];
+  const bailey = BAILEY_SPRITE[baileyAnim];
+
+  const [pressed, setPressed] = useState(false);
+  const [started, setStarted] = useState(false);
+  const [gardenHover, setGardenHover] = useState(false);
+  const [gardenFrame, setGardenFrame] = useState(0);
+  const [libraryHover, setLibraryHover] = useState(false);
+  const [libraryFrame, setLibraryFrame] = useState(0);
+  const [campfireFrame, setCampfireFrame] = useState(0);
+  const [smokeFrame, setSmokeFrame] = useState(0);
+  const [baileyFrame, setBaileyFrame] = useState(0);
+  const [jchengFrame, setJchengFrame] = useState(0);
+
+  const [jchengStep, setJchengStep] = useState(0);
+  const jchengAnim: JchengAnim = JCHENG_SEQUENCE[jchengStep];
+  const jcheng = JCHENG_SPRITE[jchengAnim];
+
+  // scale to match background-size: cover on BG_W × BG_H
+  useEffect(() => {
+    const images = PRELOAD_IMAGES.map((src) => {
+      const image = new Image();
+      image.src = src;
+      image.decode?.().catch(() => {});
+      return image;
+    });
+
+    return () => {
+      images.forEach((image) => {
+        image.src = "";
+      });
+    };
+  }, []);
+
+  const [viewport, setViewport] = useState({ width: BG_W, height: BG_H, scale: 1 });
+  useEffect(() => {
+    const update = () => {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      setViewport({
+        width,
+        height,
+        scale: Math.max(width / BG_W, height / BG_H),
+      });
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
+  const scale = viewport.scale;
+  const visibleW = viewport.width / scale;
+  const visibleH = viewport.height / scale;
+  const visibleLeft = (BG_W - visibleW) / 2;
+  const visibleRight = visibleLeft + visibleW;
+  const visibleTop = (BG_H - visibleH) / 2;
+  const visibleBottom = visibleTop + visibleH;
+
+  useEffect(() => {
+    const timer = setTimeout(
+      () => setBaileyStep((s) => (s + 1) % BAILEY_SEQUENCE.length),
+      bailey.cycleMs,
+    );
+    return () => clearTimeout(timer);
+  }, [baileyStep, bailey.cycleMs]);
+
+  useEffect(() => {
+    const timer = setTimeout(
+      () => setJchengStep((s) => (s + 1) % JCHENG_SEQUENCE.length),
+      jcheng.cycleMs,
+    );
+    return () => clearTimeout(timer);
+  }, [jchengStep, jcheng.cycleMs]);
+
+  useEffect(() => {
+    if (!gardenHover) { setGardenFrame(0); return; }
+    const ms = cyclems(3, 6) / 6;
+    const id = setInterval(() => setGardenFrame(f => (f + 1) % 6), ms);
+    return () => clearInterval(id);
+  }, [gardenHover]);
+
+  useEffect(() => {
+    if (!libraryHover) { setLibraryFrame(0); return; }
+    const ms = cyclems(3, 7) / 7;
+    const id = setInterval(() => setLibraryFrame(f => (f + 1) % 7), ms);
+    return () => clearInterval(id);
+  }, [libraryHover]);
+
+  useEffect(() => {
+    const ms = cyclems(FPS.campfire, 6) / 6;
+    const id = setInterval(() => setCampfireFrame(f => (f + 1) % 6), ms);
+    return () => clearInterval(id);
+  }, []);
+
+  useEffect(() => {
+    const ms = cyclems(FPS.smoke, 6) / 6;
+    const id = setInterval(() => setSmokeFrame(f => (f + 1) % 6), ms);
+    return () => clearInterval(id);
+  }, []);
+
+  useEffect(() => {
+    setBaileyFrame(0);
+    const ms = bailey.cycleMs / 6;
+    const id = setInterval(() => setBaileyFrame(f => (f + 1) % 6), ms);
+    return () => clearInterval(id);
+  }, [baileyStep, bailey.cycleMs]);
+
+  useEffect(() => {
+    setJchengFrame(0);
+    const ms = jcheng.cycleMs / 6;
+    const id = setInterval(() => setJchengFrame(f => (f + 1) % 6), ms);
+    return () => clearInterval(id);
+  }, [jchengStep, jcheng.cycleMs]);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <main className="relative w-screen h-screen overflow-hidden bg-black">
+      {/* background — always full screen */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          backgroundImage: "url('/assets/sprites/landing/LandingMenu_BG.png')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      />
+
+      {/* scaled sprite container — matches background cover scaling */}
+      <div
+        style={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          width: BG_W,
+          height: BG_H,
+          transform: `translate(-50%, -50%) scale(${scale})`,
+          transformOrigin: "center center",
+        }}
+      >
+        {/* welcome banner */}
+        <div
+          style={{
+            position: "absolute",
+            top: 24,
+            left: "50%",
+            transform: started ? "translateX(-50%) scale(1.08)" : "translateX(-50%) scale(1)",
+            width: 600,
+            height: Math.round(600 * 724 / 2172),
+            backgroundImage: "url('/assets/sprites/landing/Welcome.png')",
+            backgroundSize: `600px ${Math.round(600 * 724 / 2172)}px`,
+            backgroundRepeat: "no-repeat",
+            imageRendering: "pixelated",
+            opacity: started ? 0 : 1,
+            transition: "opacity 0.8s ease-out, transform 0.8s ease-out",
+            pointerEvents: "none",
+          }}
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+
+        {/* click to begin */}
+        <button
+          style={{
+            appearance: "none",
+            border: "none",
+            padding: 0,
+            background: "none",
+            position: "absolute",
+            top: "30%",
+            left: "50%",
+            width: 500,
+            height: 150,
+            backgroundImage: "url('/assets/sprites/landing/Click_to_Begin.png')",
+            backgroundSize: "500px 150px",
+            backgroundRepeat: "no-repeat",
+            imageRendering: "pixelated",
+            transform: started
+              ? "translateX(-50%) scale(1.08)"
+              : pressed
+              ? "translateX(-50%) translateY(6px)"
+              : "translateX(-50%) scale(1)",
+            transition: started
+              ? "opacity 0.8s ease-out, transform 0.8s ease-out"
+              : "transform 0.18s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+            animation: pressed ? "none" : "breathe-scale 4s ease-in-out infinite",
+            opacity: started ? 0 : 1,
+            cursor: started ? "default" : "pointer",
+            userSelect: "none",
+            pointerEvents: started ? "none" : "auto",
+          }}
+          onMouseDown={() => setPressed(true)}
+          onMouseUp={() => { setPressed(false); setTimeout(() => setStarted(true), 120); }}
+          onMouseLeave={() => setPressed(false)}
+        />
+
+        {/* ---- menu group — adjust MENU_LEFT / MENU_BOTTOM to reposition ---- */}
+        {(() => {
+          const MENU_LEFT = 24;   // px from left edge of BG
+          const MENU_BOTTOM = BG_H * 0.5;
+          const MENU_BUTTON_H = 60;
+          const MENU_BUTTONS = 2;
+          const MENU_H = MENU_BUTTON_H * MENU_BUTTONS;
+          const MENU_VISUAL_W = FRAME;
+          const MENU_VISUAL_TOP = -48;
+          const MENU_VISUAL_BOTTOM = MENU_H + 72;
+          const menuLeft = clamp(
+            MENU_LEFT,
+            visibleLeft + SCREEN_PADDING,
+            visibleRight - SCREEN_PADDING - MENU_VISUAL_W,
+          );
+          const desiredTop = BG_H - MENU_BOTTOM - MENU_H;
+          const minTop = visibleTop + SCREEN_PADDING - MENU_VISUAL_TOP;
+          const maxTop = visibleBottom - SCREEN_PADDING - MENU_VISUAL_BOTTOM;
+          const menuTop = clamp(desiredTop, minTop, maxTop);
+          const menuBottom = BG_H - menuTop - MENU_H;
+          return (
+            <div
+              style={{
+                position: "absolute",
+                left: menuLeft,
+                bottom: menuBottom,
+                opacity: started ? 1 : 0,
+                transition: "opacity 1s ease-in",
+                pointerEvents: started ? "auto" : "none",
+              }}
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+              {/* garden sign button — sized to visible art only */}
+              {/* tweak GARDEN_* constants if click area needs adjusting */}
+              {(() => {
+                const GARDEN_W = 165;    // visible art width
+                const GARDEN_H = 60;     // visible art height
+                const GARDEN_CX = 0;     // transparent padding on left
+                const GARDEN_CY = 48;    // transparent padding on top of frame
+                return (
+                  <button
+                    style={{
+                      appearance: "none",
+                      border: "none",
+                      padding: 0,
+                      background: "none",
+                      display: "block",
+                      position: "relative",
+                      width: GARDEN_W,
+                      height: GARDEN_H,
+                      overflow: "visible",
+                      cursor: "pointer",
+                    }}
+                    onMouseEnter={() => setGardenHover(true)}
+                    onMouseLeave={() => setGardenHover(false)}
+                    onClick={() => router.push("/garden")}
+                  >
+                    {/* visual — free to overflow the hit area */}
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: -GARDEN_CY,
+                        left: -GARDEN_CX,
+                        width: FRAME,
+                        height: FRAME,
+                        backgroundImage: gardenHover
+                          ? "url('/assets/sprites/landing/Garden_hover.png')"
+                          : "url('/assets/sprites/landing/Garden_sign.png')",
+                        backgroundSize: gardenHover
+                          ? `${FRAME * 6}px ${FRAME}px`
+                          : `${FRAME}px ${FRAME}px`,
+                        backgroundPosition: gardenHover ? `-${gardenFrame * FRAME}px 0` : "0 0",
+                        backgroundRepeat: "no-repeat",
+                        imageRendering: "pixelated",
+                        pointerEvents: "none",
+                      }}
+                    />
+                  </button>
+                );
+              })()}
+              {/* library sign button */}
+              {(() => {
+                const LIBRARY_W = 165;
+                const LIBRARY_H = 60;
+                const LIBRARY_CX = 0;
+                const LIBRARY_CY = 48;
+                return (
+                  <button
+                    style={{
+                      appearance: "none",
+                      border: "none",
+                      padding: 0,
+                      background: "none",
+                      display: "block",
+                      position: "relative",
+                      width: LIBRARY_W,
+                      height: LIBRARY_H,
+                      overflow: "visible",
+                      cursor: "pointer",
+                    }}
+                    onMouseEnter={() => setLibraryHover(true)}
+                    onMouseLeave={() => setLibraryHover(false)}
+                    onClick={() => router.push("/library")}
+                  >
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: -LIBRARY_CY,
+                        left: -LIBRARY_CX,
+                        width: FRAME,
+                        height: FRAME,
+                        backgroundImage: libraryHover
+                          ? "url('/assets/sprites/landing/Library_hover.png')"
+                          : "url('/assets/sprites/landing/Library_sign.png')",
+                        backgroundSize: libraryHover
+                          ? `${FRAME * 7}px ${FRAME}px`
+                          : `${FRAME}px ${FRAME}px`,
+                        backgroundPosition: libraryHover ? `-${libraryFrame * FRAME}px 0` : "0 0",
+                        backgroundRepeat: "no-repeat",
+                        imageRendering: "pixelated",
+                        pointerEvents: "none",
+                      }}
+                    />
+                  </button>
+                );
+              })()}
+            </div>
+          );
+        })()}
+
+        {/* smoke — above campfire */}
+        <div
+          style={{
+            position: "absolute",
+            top: "75%",
+            left: "48%",
+            transform: "translate(-50%, calc(-50% - 180px))",
+            width: FRAME,
+            height: FRAME,
+            backgroundImage: "url('/assets/sprites/landing/smoke.png')",
+            backgroundSize: `${FRAME * 3}px ${FRAME * 2}px`,
+            backgroundPosition: `-${(smokeFrame % 3) * FRAME}px -${Math.floor(smokeFrame / 3) * FRAME}px`,
+            backgroundRepeat: "no-repeat",
+            imageRendering: "pixelated",
+          }}
+        />
+
+        {/* campfire */}
+        <div
+          style={{
+            position: "absolute",
+            top: "70%",
+            left: "48%",
+            transform: "translate(-50%, -50%)",
+            width: FRAME,
+            height: FRAME,
+            backgroundImage: "url('/assets/sprites/landing/campfire.png')",
+            backgroundSize: `${FRAME * 3}px ${FRAME * 2}px`,
+            backgroundPosition: `-${(campfireFrame % 3) * FRAME}px -${Math.floor(campfireFrame / 3) * FRAME}px`,
+            backgroundRepeat: "no-repeat",
+            imageRendering: "pixelated",
+          }}
+        />
+
+        {/* jcheng — right of campfire */}
+        <div
+          style={{
+            position: "absolute",
+            top: "65%",
+            left: "46%",
+            transform: "translate(calc(-50% + 160px), -50%)",
+            width: FRAME,
+            height: FRAME,
+            backgroundImage: jcheng.image,
+            backgroundSize: jcheng.bgSize,
+            backgroundPosition: `-${jchengFrame * FRAME}px 0`,
+            backgroundRepeat: "no-repeat",
+            imageRendering: "pixelated",
+          }}
+        />
+
+        {/* bailey — left of campfire */}
+        <div
+          style={{
+            position: "absolute",
+            top: "65%",
+            left: "50%",
+            transform: "translate(calc(-50% - 160px), -50%)",
+            width: FRAME,
+            height: FRAME,
+            backgroundImage: bailey.image,
+            backgroundSize: bailey.bgSize,
+            backgroundPosition: `-${baileyFrame * FRAME}px 0`,
+            backgroundRepeat: "no-repeat",
+            imageRendering: "pixelated",
+          }}
+        />
+      </div>
+    </main>
   );
 }

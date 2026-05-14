@@ -24,3 +24,52 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@keyframes breathe {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.25; }
+}
+
+@keyframes breathe-scale {
+  0%, 100% { transform: translateX(-50%) scale(1); }
+  50%       { transform: translateX(-50%) scale(1.06); }
+}
+
+@keyframes float {
+  0%, 50% { transform: translateY(0px); opacity: 1; }
+  50%       { transform: translateY(-14px); opacity: 0.7; }
+}
+
+@keyframes letter-hover {
+  from { background-position: 0 0; }
+  to   { background-position: -3000px 0; }
+}
+
+/* 6-frame sprite sheet, 1 row, each frame 180×180 at display size */
+@keyframes spritesheet-1row-6 {
+  from { background-position: 0 0; }
+  to   { background-position: -1080px 0; }
+}
+
+/* garden hover — 6 frames, cropped to art area */
+@keyframes garden-hover-anim {
+  from { background-position: 0 0; }
+  to   { background-position: -1080px 0; }
+}
+
+/* library hover — 7 frames, 180×180 per frame */
+@keyframes library-hover-anim {
+  from { background-position: 0 0; }
+  to   { background-position: -1260px 0; }
+}
+
+/* 6-frame sprite sheet, 3 cols × 2 rows, each frame 180×180 at display size */
+@keyframes spritesheet-2row {
+  0%     { background-position:    0px    0px; }
+  16.67% { background-position: -180px    0px; }
+  33.33% { background-position: -360px    0px; }
+  50%    { background-position:    0px -180px; }
+  66.67% { background-position: -180px -180px; }
+  83.33% { background-position: -360px -180px; }
+  100%   { background-position:    0px    0px; }
+}
