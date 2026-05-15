@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, CSSProperties } from "react";
+import { assetPath, assetUrl } from "@/lib/asset-paths";
 
 type AppState = "overview" | "zooming" | "entering" | "letter" | "exiting" | "outside-zooming" | "outside";
 type LetterState = "idle" | "hover" | "opening" | "open";
@@ -40,7 +41,7 @@ export default function RoomPage() {
   useEffect(() => {
     const images = PRELOAD_IMAGES.map((src) => {
       const image = new Image();
-      image.src = src;
+      image.src = assetPath(src);
       image.decode?.().catch(() => {});
       return image;
     });
@@ -63,7 +64,7 @@ export default function RoomPage() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    const audio = new Audio("/assets/room_bgmusic.ogg");
+    const audio = new Audio(assetPath("/assets/room_bgmusic.ogg"));
     audio.loop = true;
     audio.volume = 0.5;
     audioRef.current = audio;
@@ -126,7 +127,7 @@ export default function RoomPage() {
     ? {
         width: 750,
         height: 750,
-        backgroundImage: "url('/assets/sprites/room/Letter_opened.png')",
+        backgroundImage: assetUrl("/assets/sprites/room/Letter_opened.png"),
         backgroundSize: "750px 750px",
         backgroundRepeat: "no-repeat",
       }
@@ -134,7 +135,7 @@ export default function RoomPage() {
     ? {
         width: OPEN_SIZE,
         height: OPEN_SIZE,
-        backgroundImage: "url('/assets/sprites/room/Letter_open_animation.png')",
+        backgroundImage: assetUrl("/assets/sprites/room/Letter_open_animation.png"),
         backgroundSize: `${OPEN_FRAMES * OPEN_SIZE}px ${OPEN_SIZE}px`,
         backgroundPosition: `-${openFrame * OPEN_SIZE}px 0`,
         backgroundRepeat: "no-repeat",
@@ -143,7 +144,7 @@ export default function RoomPage() {
     ? {
         width: HOVER_W,
         height: HOVER_H,
-        backgroundImage: "url('/assets/sprites/room/Letter_hovor_animation.png')",
+        backgroundImage: assetUrl("/assets/sprites/room/Letter_hovor_animation.png"),
         backgroundSize: `${HOVER_FRAMES * HOVER_W}px ${HOVER_H}px`,
         backgroundRepeat: "no-repeat",
         animation: `letter-hover ${HOVER_FRAMES * 0.25}s steps(${HOVER_FRAMES}) infinite`,
@@ -151,7 +152,7 @@ export default function RoomPage() {
     : {
         width: IDLE_W,
         height: IDLE_H,
-        backgroundImage: "url('/assets/sprites/room/Letter.png')",
+        backgroundImage: assetUrl("/assets/sprites/room/Letter.png"),
         backgroundSize: `${IDLE_W}px ${IDLE_H}px`,
         backgroundRepeat: "no-repeat",
       };
@@ -168,7 +169,7 @@ export default function RoomPage() {
           style={{
             position: "absolute",
             inset: 0,
-            backgroundImage: "url('/assets/sprites/room/desk_background.png')",
+            backgroundImage: assetUrl("/assets/sprites/room/desk_background.png"),
             backgroundSize: "cover",
             backgroundPosition: "center",
             transform: deskScale,
@@ -224,7 +225,7 @@ export default function RoomPage() {
           style={{
             position: "absolute",
             inset: 0,
-            backgroundImage: "url('/assets/sprites/room/outside_background.png')",
+            backgroundImage: assetUrl("/assets/sprites/room/outside_background.png"),
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}
@@ -247,7 +248,7 @@ export default function RoomPage() {
         style={{
           width: "100%",
           height: "100%",
-          backgroundImage: doorHover || appState === "outside-zooming" ? "url('/assets/sprites/room/door_hover.png')" : "url('/assets/sprites/room/background.png')",
+          backgroundImage: doorHover || appState === "outside-zooming" ? assetUrl("/assets/sprites/room/door_hover.png") : assetUrl("/assets/sprites/room/background.png"),
           backgroundSize: "cover",
           backgroundPosition: "center",
           transformOrigin: appState === "outside-zooming" ? "10% center" : "center center",

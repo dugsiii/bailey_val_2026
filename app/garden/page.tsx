@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { assetUrl } from "@/lib/asset-paths";
 
 const BG_W = 1672;
 const BG_H = 941;
@@ -21,12 +22,12 @@ const FLOWER_POTS_H = Math.round(FLOWER_POTS_W * (1024 / 1536));
 
 const BASKET_TEXT = `Dear Bailey,
 
-I know you spend so much of yourself taking care of other people, but please remember to take care of yourself too. You deserve the same attentive care that you give everyone else. I'm proud of you, and I hope you know how appreciated and loved you are.
+You are so caring and attentive to others, I fear you often forget to take care of yourself. You pour so much of yourself into others, not stopping to think of yourself. You model the self sacrificial attitude of Christ so well. 
 
-I hope today feels as warm as you make every day feel.
+I pray that as you pour into others, that Christ sustains you and gives you rest.
 
-Thinking of you,
-Jeshua`;
+Jeshua
+`;
 
 const WATERING_CAN_TEXT = `Dear Bailey,
 
@@ -92,7 +93,7 @@ function Overlay({ state, text, images }: { state: OverlayState; text: string; i
             <div key={i} style={{
               width: "22vmin", height: "22vmin", borderRadius: 8,
               ...(img
-                ? { backgroundImage: `url('${img.src}')`, backgroundSize: "cover", backgroundPosition: "center" }
+                ? { backgroundImage: assetUrl(img.src), backgroundSize: "cover", backgroundPosition: "center" }
                 : { background: "rgba(255,255,255,0.08)", border: "2px solid rgba(255,255,255,0.25)" }),
             }} />
           ))}
@@ -135,26 +136,26 @@ export default function GardenPage() {
 
   return (
     <main className="relative w-screen h-screen overflow-hidden bg-black">
-      <div style={{ position: "absolute", inset: 0, backgroundImage: "url('/assets/sprites/landing/garden/background.png')", backgroundSize: "cover", backgroundPosition: "center" }} />
+      <div style={{ position: "absolute", inset: 0, backgroundImage: assetUrl("/assets/sprites/landing/garden/background.png"), backgroundSize: "cover", backgroundPosition: "center" }} />
 
       <div style={{ position: "absolute", top: "50%", left: "50%", width: BG_W, height: BG_H, transform: `translate(-50%, -50%) scale(${scale})`, transformOrigin: "center center" }}>
         {/* jeshua — watering */}
-        <div style={{ position: "absolute", top: "60%", left: "31%", transform: "translate(-50%, -50%)", width: JESHUA_WATER_SIZE, height: JESHUA_WATER_SIZE, backgroundImage: "url('/assets/sprites/landing/garden/jeshua_water.png')", backgroundSize: `${JESHUA_WATER_SIZE * JESHUA_WATER_FRAMES}px ${JESHUA_WATER_SIZE}px`, backgroundPosition: `-${jeshuaFrame * JESHUA_WATER_SIZE}px 0`, backgroundRepeat: "no-repeat", imageRendering: "pixelated" }} />
+        <div style={{ position: "absolute", top: "60%", left: "31%", transform: "translate(-50%, -50%)", width: JESHUA_WATER_SIZE, height: JESHUA_WATER_SIZE, backgroundImage: assetUrl("/assets/sprites/landing/garden/jeshua_water.png"), backgroundSize: `${JESHUA_WATER_SIZE * JESHUA_WATER_FRAMES}px ${JESHUA_WATER_SIZE}px`, backgroundPosition: `-${jeshuaFrame * JESHUA_WATER_SIZE}px 0`, backgroundRepeat: "no-repeat", imageRendering: "pixelated" }} />
 
         {/* watering can */}
-        <div style={{ position: "absolute", top: "52%", left: "80%", transform: "translate(-50%, -50%)", width: WATERING_CAN_W, height: WATERING_CAN_H, backgroundImage: "url('/assets/sprites/landing/garden/watering_can.png')", backgroundSize: `${WATERING_CAN_W}px ${WATERING_CAN_H}px`, backgroundRepeat: "no-repeat", imageRendering: "pixelated", cursor: "pointer" }} onClick={() => can.setOpen(true)} />
+        <div style={{ position: "absolute", top: "52%", left: "80%", transform: "translate(-50%, -50%)", width: WATERING_CAN_W, height: WATERING_CAN_H, backgroundImage: assetUrl("/assets/sprites/landing/garden/watering_can.png"), backgroundSize: `${WATERING_CAN_W}px ${WATERING_CAN_H}px`, backgroundRepeat: "no-repeat", imageRendering: "pixelated", cursor: "pointer" }} onClick={() => can.setOpen(true)} />
 
         {/* flower pots */}
-        <div style={{ position: "absolute", top: "43%", left: "35%", transform: "translate(-50%, -50%)", width: FLOWER_POTS_W, height: FLOWER_POTS_H, backgroundImage: "url('/assets/sprites/landing/garden/flower_pots.png')", backgroundSize: `${FLOWER_POTS_W}px ${FLOWER_POTS_H}px`, backgroundRepeat: "no-repeat", imageRendering: "pixelated", cursor: "pointer" }} onClick={() => pots.setOpen(true)} />
+        <div style={{ position: "absolute", top: "43%", left: "35%", transform: "translate(-50%, -50%)", width: FLOWER_POTS_W, height: FLOWER_POTS_H, backgroundImage: assetUrl("/assets/sprites/landing/garden/flower_pots.png"), backgroundSize: `${FLOWER_POTS_W}px ${FLOWER_POTS_H}px`, backgroundRepeat: "no-repeat", imageRendering: "pixelated", cursor: "pointer" }} onClick={() => pots.setOpen(true)} />
 
         {/* picnic blanket — under bailey */}
-        <div style={{ position: "absolute", top: "58%", left: "68%", transform: "translate(-50%, -50%)", width: BLANKET_W, height: BLANKET_H, backgroundImage: "url('/assets/sprites/landing/garden/picnic_blanket.png')", backgroundSize: `${BLANKET_W}px ${BLANKET_H}px`, backgroundRepeat: "no-repeat", imageRendering: "pixelated" }} />
+        <div style={{ position: "absolute", top: "58%", left: "68%", transform: "translate(-50%, -50%)", width: BLANKET_W, height: BLANKET_H, backgroundImage: assetUrl("/assets/sprites/landing/garden/picnic_blanket.png"), backgroundSize: `${BLANKET_W}px ${BLANKET_H}px`, backgroundRepeat: "no-repeat", imageRendering: "pixelated" }} />
 
         {/* picnic basket */}
-        <div style={{ position: "absolute", top: "55%", left: "55%", transform: "translate(-50%, -50%)", width: BASKET_SIZE, height: BASKET_SIZE, backgroundImage: "url('/assets/sprites/landing/garden/picnic_basket.png')", backgroundSize: `${BASKET_SIZE}px ${BASKET_SIZE}px`, backgroundRepeat: "no-repeat", imageRendering: "pixelated", cursor: "pointer" }} onClick={() => basket.setOpen(true)} />
+        <div style={{ position: "absolute", top: "55%", left: "55%", transform: "translate(-50%, -50%)", width: BASKET_SIZE, height: BASKET_SIZE, backgroundImage: assetUrl("/assets/sprites/landing/garden/picnic_basket.png"), backgroundSize: `${BASKET_SIZE}px ${BASKET_SIZE}px`, backgroundRepeat: "no-repeat", imageRendering: "pixelated", cursor: "pointer" }} onClick={() => basket.setOpen(true)} />
 
         {/* bailey */}
-        <div style={{ position: "absolute", top: BAILEY.top, left: BAILEY.left, transform: "translate(-50%, -50%)", width: BAILEY.size, height: BAILEY.size, backgroundImage: `url('/assets/sprites/landing/garden/${BAILEY.file}.png')`, backgroundSize: `${BAILEY.size * BAILEY.frames}px ${BAILEY.size}px`, backgroundPosition: `-${baileyFrame * BAILEY.size}px 0`, backgroundRepeat: "no-repeat", imageRendering: "pixelated" }} />
+        <div style={{ position: "absolute", top: BAILEY.top, left: BAILEY.left, transform: "translate(-50%, -50%)", width: BAILEY.size, height: BAILEY.size, backgroundImage: assetUrl(`/assets/sprites/landing/garden/${BAILEY.file}.png`), backgroundSize: `${BAILEY.size * BAILEY.frames}px ${BAILEY.size}px`, backgroundPosition: `-${baileyFrame * BAILEY.size}px 0`, backgroundRepeat: "no-repeat", imageRendering: "pixelated" }} />
       </div>
 
       {basket.open && <Overlay state={basket} text={BASKET_TEXT} images={[{ src: "/assets/sprites/landing/garden/basket_image_1.png" }, { src: "/assets/sprites/landing/garden/basket_image_2.png" }]} />}

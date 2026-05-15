@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { assetUrl } from "@/lib/asset-paths";
 
 const BG_W = 1672;
 const BG_H = 941;
@@ -19,11 +20,11 @@ type BaileyAnim = typeof BAILEY_SEQUENCE[number];
 
 const BAILEY_SPRITE: Record<BaileyAnim, { image: string; cycleMs: number }> = {
   idle: {
-    image:   "url('/assets/sprites/landing/library/bailey_idle.png')",
+    image:   assetUrl("/assets/sprites/landing/library/bailey_idle.png"),
     cycleMs: cyclems(FPS.baileyIdle, 6),
   },
   flipping: {
-    image:   "url('/assets/sprites/landing/library/bailey_flipping.png')",
+    image:   assetUrl("/assets/sprites/landing/library/bailey_flipping.png"),
     cycleMs: cyclems(FPS.baileyFlipping, 6),
   },
 };
@@ -81,22 +82,22 @@ export default function LibraryPage() {
 
   const BOOK_ASSETS = {
     1: {
-      floor:   "url('/assets/sprites/landing/library/book_1_floor.png')",
-      pickup:  "url('/assets/sprites/landing/library/book_1_pickup.png')",
-      open:    "url('/assets/sprites/landing/library/book_1_open.png')",
-      display: "url('/assets/sprites/landing/library/book_1_display.png')",
+      floor:   assetUrl("/assets/sprites/landing/library/book_1_floor.png"),
+      pickup:  assetUrl("/assets/sprites/landing/library/book_1_pickup.png"),
+      open:    assetUrl("/assets/sprites/landing/library/book_1_open.png"),
+      display: assetUrl("/assets/sprites/landing/library/book_1_display.png"),
     },
     2: {
-      floor:   "url('/assets/sprites/landing/library/book_2_floor.png')",
-      pickup:  "url('/assets/sprites/landing/library/book_2_pickup.png')",
-      open:    "url('/assets/sprites/landing/library/book_2_open.png')",
-      display: "url('/assets/sprites/landing/library/book_2_display.png')",
+      floor:   assetUrl("/assets/sprites/landing/library/book_2_floor.png"),
+      pickup:  assetUrl("/assets/sprites/landing/library/book_2_pickup.png"),
+      open:    assetUrl("/assets/sprites/landing/library/book_2_open.png"),
+      display: assetUrl("/assets/sprites/landing/library/book_2_display.png"),
     },
     3: {
-      floor:   "url('/assets/sprites/landing/library/book_3_floor.png')",
-      pickup:  "url('/assets/sprites/landing/library/book_3_pickup.png')",
-      open:    "url('/assets/sprites/landing/library/book_3_open.png')",
-      display: "url('/assets/sprites/landing/library/book_3_display.png')",
+      floor:   assetUrl("/assets/sprites/landing/library/book_3_floor.png"),
+      pickup:  assetUrl("/assets/sprites/landing/library/book_3_pickup.png"),
+      open:    assetUrl("/assets/sprites/landing/library/book_3_open.png"),
+      display: assetUrl("/assets/sprites/landing/library/book_3_display.png"),
     },
   } as const;
 
@@ -131,7 +132,7 @@ export default function LibraryPage() {
         style={{
           position: "absolute",
           inset: 0,
-          backgroundImage: "url('/assets/sprites/landing/library/background.png')",
+          backgroundImage: assetUrl("/assets/sprites/landing/library/background.png"),
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
@@ -175,7 +176,7 @@ export default function LibraryPage() {
             transform: "translate(-50%, -50%)",
             width: JESHUA_SIZE,
             height: JESHUA_SIZE,
-            backgroundImage: "url('/assets/sprites/landing/library/jeshua.png')",
+            backgroundImage: assetUrl("/assets/sprites/landing/library/jeshua.png"),
             backgroundSize: `${JESHUA_SIZE}px ${JESHUA_SIZE}px`,
             backgroundRepeat: "no-repeat",
             imageRendering: "pixelated",
@@ -191,7 +192,7 @@ export default function LibraryPage() {
             transform: "translate(-50%, -50%)",
             width: SLEEP_SIZE,
             height: SLEEP_SIZE,
-            backgroundImage: "url('/assets/sprites/landing/library/sleep_effect.png')",
+            backgroundImage: assetUrl("/assets/sprites/landing/library/sleep_effect.png"),
             backgroundSize: `${SLEEP_SIZE * 6}px ${SLEEP_SIZE}px`,
             backgroundPosition: `-${sleepFrame * SLEEP_SIZE}px 0`,
             backgroundRepeat: "no-repeat",

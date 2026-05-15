@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { assetPath, assetUrl } from "@/lib/asset-paths";
 
 const BG_W = 1672;
 const BG_H = 941;
@@ -47,13 +48,13 @@ type BaileyAnim = typeof BAILEY_SEQUENCE[number];
 
 const BAILEY_SPRITE: Record<BaileyAnim, { image: string; bgSize: string; frames: number; cycleMs: number }> = {
   idle: {
-    image:   "url('/assets/sprites/landing/bailey_log_idle.png')",
+    image:   assetUrl("/assets/sprites/landing/bailey_log_idle.png"),
     bgSize:  `${FRAME * 6}px ${FRAME}px`,
     frames:  6,
     cycleMs: cyclems(FPS.baileyIdle, 6),
   },
   marshmallow: {
-    image:   "url('/assets/sprites/landing/bailey_marshmallow_log.png')",
+    image:   assetUrl("/assets/sprites/landing/bailey_marshmallow_log.png"),
     bgSize:  `${FRAME * 6}px ${FRAME}px`,
     frames:  6,
     cycleMs: cyclems(FPS.baileyMarshmallow, 6),
@@ -61,7 +62,7 @@ const BAILEY_SPRITE: Record<BaileyAnim, { image: string; bgSize: string; frames:
 };
 
 const BAILEY_SANDWICH = {
-  image:   "url('/assets/sprites/landing/garden/bailey_sandwich.png')",
+  image:   assetUrl("/assets/sprites/landing/garden/bailey_sandwich.png"),
   bgSize:  `${FRAME * 6}px ${FRAME}px`,
   frames:  6,
   cycleMs: cyclems(FPS.baileySandwich, 6),
@@ -73,12 +74,12 @@ type JchengAnim = typeof JCHENG_SEQUENCE[number];
 
 const JCHENG_SPRITE: Record<JchengAnim, { image: string; bgSize: string; cycleMs: number }> = {
   idle: {
-    image:   "url('/assets/sprites/landing/jeshua_idle_animation.png')",
+    image:   assetUrl("/assets/sprites/landing/jeshua_idle_animation.png"),
     bgSize:  `${FRAME * 6}px ${FRAME}px`,
     cycleMs: cyclems(FPS.jchengIdle, 6),
   },
   look: {
-    image:   "url('/assets/sprites/landing/jeshua_look_animation.png')",
+    image:   assetUrl("/assets/sprites/landing/jeshua_look_animation.png"),
     bgSize:  `${FRAME * 6}px ${FRAME}px`,
     cycleMs: cyclems(FPS.jchengLook, 6),
   },
@@ -112,7 +113,7 @@ export default function LandingPage() {
   useEffect(() => {
     const images = PRELOAD_IMAGES.map((src) => {
       const image = new Image();
-      image.src = src;
+      image.src = assetPath(src);
       image.decode?.().catch(() => {});
       return image;
     });
@@ -211,7 +212,7 @@ export default function LandingPage() {
         style={{
           position: "absolute",
           inset: 0,
-          backgroundImage: "url('/assets/sprites/landing/LandingMenu_BG.png')",
+          backgroundImage: assetUrl("/assets/sprites/landing/LandingMenu_BG.png"),
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
@@ -238,7 +239,7 @@ export default function LandingPage() {
             transform: started ? "translateX(-50%) scale(1.08)" : "translateX(-50%) scale(1)",
             width: 600,
             height: Math.round(600 * 724 / 2172),
-            backgroundImage: "url('/assets/sprites/landing/Welcome.png')",
+            backgroundImage: assetUrl("/assets/sprites/landing/Welcome.png"),
             backgroundSize: `600px ${Math.round(600 * 724 / 2172)}px`,
             backgroundRepeat: "no-repeat",
             imageRendering: "pixelated",
@@ -260,7 +261,7 @@ export default function LandingPage() {
             left: "50%",
             width: 500,
             height: 150,
-            backgroundImage: "url('/assets/sprites/landing/Click_to_Begin.png')",
+            backgroundImage: assetUrl("/assets/sprites/landing/Click_to_Begin.png"),
             backgroundSize: "500px 150px",
             backgroundRepeat: "no-repeat",
             imageRendering: "pixelated",
@@ -348,8 +349,8 @@ export default function LandingPage() {
                         width: FRAME,
                         height: FRAME,
                         backgroundImage: gardenHover
-                          ? "url('/assets/sprites/landing/Garden_hover.png')"
-                          : "url('/assets/sprites/landing/Garden_sign.png')",
+                          ? assetUrl("/assets/sprites/landing/Garden_hover.png")
+                          : assetUrl("/assets/sprites/landing/Garden_sign.png"),
                         backgroundSize: gardenHover
                           ? `${FRAME * 6}px ${FRAME}px`
                           : `${FRAME}px ${FRAME}px`,
@@ -394,8 +395,8 @@ export default function LandingPage() {
                         width: FRAME,
                         height: FRAME,
                         backgroundImage: libraryHover
-                          ? "url('/assets/sprites/landing/Library_hover.png')"
-                          : "url('/assets/sprites/landing/Library_sign.png')",
+                          ? assetUrl("/assets/sprites/landing/Library_hover.png")
+                          : assetUrl("/assets/sprites/landing/Library_sign.png"),
                         backgroundSize: libraryHover
                           ? `${FRAME * 7}px ${FRAME}px`
                           : `${FRAME}px ${FRAME}px`,
@@ -421,7 +422,7 @@ export default function LandingPage() {
             transform: "translate(-50%, calc(-50% - 180px))",
             width: FRAME,
             height: FRAME,
-            backgroundImage: "url('/assets/sprites/landing/smoke.png')",
+            backgroundImage: assetUrl("/assets/sprites/landing/smoke.png"),
             backgroundSize: `${FRAME * 3}px ${FRAME * 2}px`,
             backgroundPosition: `-${(smokeFrame % 3) * FRAME}px -${Math.floor(smokeFrame / 3) * FRAME}px`,
             backgroundRepeat: "no-repeat",
@@ -438,7 +439,7 @@ export default function LandingPage() {
             transform: "translate(-50%, -50%)",
             width: FRAME,
             height: FRAME,
-            backgroundImage: "url('/assets/sprites/landing/campfire.png')",
+            backgroundImage: assetUrl("/assets/sprites/landing/campfire.png"),
             backgroundSize: `${FRAME * 3}px ${FRAME * 2}px`,
             backgroundPosition: `-${(campfireFrame % 3) * FRAME}px -${Math.floor(campfireFrame / 3) * FRAME}px`,
             backgroundRepeat: "no-repeat",
