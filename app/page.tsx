@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, CSSProperties } from "react";
 import { useRouter } from "next/navigation";
 import { assetPath, assetUrl } from "@/lib/asset-paths";
 
@@ -95,7 +95,9 @@ export default function LandingPage() {
   const activeBailey = baileyShowSandwich ? BAILEY_SANDWICH : bailey;
 
   const [pressed, setPressed] = useState(false);
-  const [started, setStarted] = useState(false);
+  const [started, setStarted] = useState(() =>
+    typeof window !== "undefined" && sessionStorage.getItem("landing-started") === "true"
+  );
   const [gardenHover, setGardenHover] = useState(false);
   const [gardenFrame, setGardenFrame] = useState(0);
   const [libraryHover, setLibraryHover] = useState(false);
@@ -108,6 +110,52 @@ export default function LandingPage() {
   const [jchengStep, setJchengStep] = useState(0);
   const jchengAnim: JchengAnim = JCHENG_SEQUENCE[jchengStep];
   const jcheng = JCHENG_SPRITE[jchengAnim];
+
+  const [muted, setMuted] = useState(false);
+  const [muteHover, setMuteHover] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    const audio = new Audio(assetPath("/assets/sprites/landing/[Playlist] The Sounds of Summer 4.mp3"));
+    audio.loop = true;
+    audio.volume = 0.5;
+    audioRef.current = audio;
+    return () => { audio.pause(); audio.src = ""; };
+  }, []);
+
+  useEffect(() => {
+    if (!started) return;
+    sessionStorage.setItem("landing-started", "true");
+    audioRef.current?.play().catch(() => {});
+  }, [started]);
+
+  const toggleMute = () => {
+    if (!audioRef.current) return;
+    audioRef.current.muted = !muted;
+    setMuted(m => !m);
+  };
+
+  const muteButtonStyle: CSSProperties = {
+    position: "fixed",
+    bottom: 24,
+    right: 24,
+    width: 48,
+    height: 48,
+    borderRadius: "50%",
+    background: muteHover ? "rgba(255,255,255,0.25)" : "rgba(255,255,255,0.12)",
+    border: "2px solid rgba(255,255,255,0.4)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    cursor: "pointer",
+    fontSize: 22,
+    transition: "background 0.2s, transform 0.2s",
+    transform: muteHover ? "scale(1.15)" : "scale(1)",
+    zIndex: 999,
+    userSelect: "none",
+    opacity: started ? 1 : 0,
+    pointerEvents: started ? "auto" : "none",
+  };
 
   // scale to match background-size: cover on BG_W × BG_H
   useEffect(() => {
@@ -482,6 +530,15 @@ export default function LandingPage() {
             cursor: "pointer",
           }}
         />
+      </div>
+
+      <div
+        style={muteButtonStyle}
+        onClick={toggleMute}
+        onMouseEnter={() => setMuteHover(true)}
+        onMouseLeave={() => setMuteHover(false)}
+      >
+        {muted ? "🔇" : "🔊"}
       </div>
     </main>
   );

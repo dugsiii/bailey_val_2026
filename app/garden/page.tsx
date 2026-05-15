@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { assetUrl } from "@/lib/asset-paths";
+import { useState, useEffect, useRef, CSSProperties } from "react";
+import { assetPath, assetUrl } from "@/lib/asset-paths";
 
 const BG_W = 1672;
 const BG_H = 941;
@@ -31,11 +31,12 @@ Jeshua
 
 const WATERING_CAN_TEXT = `Dear Bailey, 
 
-Remember to keep watering the plants in your garden.
-As life begins to get tedious and tiring, don’t forget to invest in the things that matter. In this period of life where God has put you in a challenging situation, I pray that you grow in the way He desires you to.
-One day, you'll look around and realize you've built a beautiful garden. I'm so proud of you, always. 
+Remember to keep watering your plants. One day, you'll look around and realize you've built a beautiful garden.
 
-Jeshua`;
+As life begins to get tedious and tiring, don’t forget to invest in the things that matter. In this period of life where God has put you in a challenging situation, I pray that you continue to develop in His designed way. I'm so proud of you, always. 
+
+Jeshua
+`;
 
 const FLOWER_POTS_TEXT = `Dear Bailey,
 
@@ -105,6 +106,53 @@ function Overlay({ state, text, images }: { state: OverlayState; text: string; i
 }
 
 export default function GardenPage() {
+  const [muted, setMuted] = useState(false);
+  const [muteHover, setMuteHover] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    const src = assetPath("/assets/sprites/landing/garden/you%27re in the secret garden _ a playlist.mp3");
+    const audio = new Audio(src);
+    audio.loop = true;
+    audio.volume = 0.5;
+    audioRef.current = audio;
+    const tryPlay = () => audio.play().catch(() => {});
+    audio.play().catch(() => {
+      document.addEventListener("click", tryPlay, { once: true });
+    });
+    return () => {
+      audio.pause();
+      audio.src = "";
+      document.removeEventListener("click", tryPlay);
+    };
+  }, []);
+
+  const toggleMute = () => {
+    if (!audioRef.current) return;
+    audioRef.current.muted = !muted;
+    setMuted(m => !m);
+  };
+
+  const muteButtonStyle: CSSProperties = {
+    position: "fixed",
+    bottom: 24,
+    right: 24,
+    width: 48,
+    height: 48,
+    borderRadius: "50%",
+    background: muteHover ? "rgba(255,255,255,0.25)" : "rgba(255,255,255,0.12)",
+    border: "2px solid rgba(255,255,255,0.4)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    cursor: "pointer",
+    fontSize: 22,
+    transition: "background 0.2s, transform 0.2s",
+    transform: muteHover ? "scale(1.15)" : "scale(1)",
+    zIndex: 999,
+    userSelect: "none",
+  };
+
   const [scale, setScale] = useState(1);
   useEffect(() => {
     const update = () =>
@@ -153,6 +201,15 @@ export default function GardenPage() {
 
         {/* bailey */}
         <div style={{ position: "absolute", top: BAILEY.top, left: BAILEY.left, transform: "translate(-50%, -50%)", width: BAILEY.size, height: BAILEY.size, backgroundImage: assetUrl(`/assets/sprites/landing/garden/${BAILEY.file}.png`), backgroundSize: `${BAILEY.size * BAILEY.frames}px ${BAILEY.size}px`, backgroundPosition: `-${baileyFrame * BAILEY.size}px 0`, backgroundRepeat: "no-repeat", imageRendering: "pixelated" }} />
+      </div>
+
+      <div
+        style={muteButtonStyle}
+        onClick={toggleMute}
+        onMouseEnter={() => setMuteHover(true)}
+        onMouseLeave={() => setMuteHover(false)}
+      >
+        {muted ? "🔇" : "🔊"}
       </div>
 
       {basket.open && <Overlay state={basket} text={BASKET_TEXT} images={[{ src: "/assets/sprites/landing/garden/basket_image_1.png" }, { src: "/assets/sprites/landing/garden/basket_image_2.png" }]} />}
