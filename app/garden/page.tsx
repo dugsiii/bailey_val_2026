@@ -111,7 +111,7 @@ export default function GardenPage() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    const src = assetPath("/assets/sprites/landing/garden/you%27re in the secret garden _ a playlist.mp3");
+    const src = encodeURI(assetPath("/assets/sprites/landing/garden/you're in the secret garden _ a playlist.mp3"));
     const audio = new Audio(src);
     audio.loop = true;
     audio.volume = 0.5;

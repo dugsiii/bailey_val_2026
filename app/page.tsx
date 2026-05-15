@@ -116,7 +116,7 @@ export default function LandingPage() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    const audio = new Audio(assetPath("/assets/sprites/landing/[Playlist] The Sounds of Summer 4.mp3"));
+    const audio = new Audio(encodeURI(assetPath("/assets/sprites/landing/[Playlist] The Sounds of Summer 4.mp3")));
     audio.loop = true;
     audio.volume = 0.5;
     audioRef.current = audio;
