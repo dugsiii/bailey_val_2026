@@ -22,6 +22,7 @@ const PRELOAD_IMAGES = [
   "/assets/sprites/landing/Library_hover.png",
   "/assets/sprites/landing/bailey_log_idle.png",
   "/assets/sprites/landing/bailey_marshmallow_log.png",
+  "/assets/sprites/landing/garden/bailey_sandwich.png",
   "/assets/sprites/landing/jeshua_idle_animation.png",
   "/assets/sprites/landing/jeshua_look_animation.png",
   "/assets/sprites/landing/campfire.png",
@@ -35,6 +36,7 @@ const FPS = {
   jchengLook:        2,
   baileyIdle:        2,
   baileyMarshmallow: 2,
+  baileySandwich:    2,
 };
 
 const cyclems = (fps: number, frames: number) => (frames / fps) * 1000;
@@ -43,17 +45,26 @@ const cyclems = (fps: number, frames: number) => (frames / fps) * 1000;
 const BAILEY_SEQUENCE = ["idle", "idle", "idle", "marshmallow"] as const;
 type BaileyAnim = typeof BAILEY_SEQUENCE[number];
 
-const BAILEY_SPRITE: Record<BaileyAnim, { image: string; bgSize: string; cycleMs: number }> = {
+const BAILEY_SPRITE: Record<BaileyAnim, { image: string; bgSize: string; frames: number; cycleMs: number }> = {
   idle: {
     image:   "url('/assets/sprites/landing/bailey_log_idle.png')",
     bgSize:  `${FRAME * 6}px ${FRAME}px`,
+    frames:  6,
     cycleMs: cyclems(FPS.baileyIdle, 6),
   },
   marshmallow: {
     image:   "url('/assets/sprites/landing/bailey_marshmallow_log.png')",
     bgSize:  `${FRAME * 6}px ${FRAME}px`,
+    frames:  6,
     cycleMs: cyclems(FPS.baileyMarshmallow, 6),
   },
+};
+
+const BAILEY_SANDWICH = {
+  image:   "url('/assets/sprites/landing/garden/bailey_sandwich.png')",
+  bgSize:  `${FRAME * 6}px ${FRAME}px`,
+  frames:  6,
+  cycleMs: cyclems(FPS.baileySandwich, 6),
 };
 
 // — Jcheng —
@@ -78,6 +89,9 @@ export default function LandingPage() {
   const [baileyStep, setBaileyStep] = useState(0);
   const baileyAnim: BaileyAnim = BAILEY_SEQUENCE[baileyStep];
   const bailey = BAILEY_SPRITE[baileyAnim];
+
+  const [baileyShowSandwich, setBaileyShowSandwich] = useState(false);
+  const activeBailey = baileyShowSandwich ? BAILEY_SANDWICH : bailey;
 
   const [pressed, setPressed] = useState(false);
   const [started, setStarted] = useState(false);
@@ -178,10 +192,10 @@ export default function LandingPage() {
 
   useEffect(() => {
     setBaileyFrame(0);
-    const ms = bailey.cycleMs / 6;
-    const id = setInterval(() => setBaileyFrame(f => (f + 1) % 6), ms);
+    const ms = activeBailey.cycleMs / activeBailey.frames;
+    const id = setInterval(() => setBaileyFrame(f => (f + 1) % activeBailey.frames), ms);
     return () => clearInterval(id);
-  }, [baileyStep, bailey.cycleMs]);
+  }, [baileyStep, baileyShowSandwich, activeBailey.cycleMs, activeBailey.frames]);
 
   useEffect(() => {
     setJchengFrame(0);
@@ -451,6 +465,7 @@ export default function LandingPage() {
 
         {/* bailey — left of campfire */}
         <div
+          onClick={() => setBaileyShowSandwich(s => !s)}
           style={{
             position: "absolute",
             top: "65%",
@@ -458,11 +473,12 @@ export default function LandingPage() {
             transform: "translate(calc(-50% - 160px), -50%)",
             width: FRAME,
             height: FRAME,
-            backgroundImage: bailey.image,
-            backgroundSize: bailey.bgSize,
+            backgroundImage: activeBailey.image,
+            backgroundSize: activeBailey.bgSize,
             backgroundPosition: `-${baileyFrame * FRAME}px 0`,
             backgroundRepeat: "no-repeat",
             imageRendering: "pixelated",
+            cursor: "pointer",
           }}
         />
       </div>

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 
 const BG_W = 1672;
 const BG_H = 941;
-const FRAME = 160;
+const FRAME = 200;
 
 const FPS = {
   baileyIdle:     2,
@@ -30,7 +30,7 @@ const BAILEY_SPRITE: Record<BaileyAnim, { image: string; cycleMs: number }> = {
 
 const JESHUA_SIZE = 200;
 const SLEEP_SIZE = 100;
-const BOOK_FLOOR_SIZE = 80;
+const BOOK_FLOOR_SIZE = 125;
 const BOOK_PICKUP_SIZE = 400;
 const BOOK_OPEN_FRAMES = 6;
 const BOOK_OPEN_FPS = 8;
@@ -73,10 +73,10 @@ export default function LibraryPage() {
 
   type BookState = "floor" | "pickup" | "opening" | "open" | "display";
   const [bookState, setBookState] = useState<BookState>("floor");
-  const [activeBook, setActiveBook] = useState<1 | 2>(1);
+  const [activeBook, setActiveBook] = useState<1 | 2 | 3>(1);
   const [openFrame, setOpenFrame] = useState(0);
 
-  const pickUp = (book: 1 | 2) => { setActiveBook(book); setBookState("pickup"); };
+  const pickUp = (book: 1 | 2 | 3) => { setActiveBook(book); setBookState("pickup"); };
   const putDown = () => { setBookState("floor"); setOpenFrame(0); };
 
   const BOOK_ASSETS = {
@@ -91,6 +91,12 @@ export default function LibraryPage() {
       pickup:  "url('/assets/sprites/landing/library/book_2_pickup.png')",
       open:    "url('/assets/sprites/landing/library/book_2_open.png')",
       display: "url('/assets/sprites/landing/library/book_2_display.png')",
+    },
+    3: {
+      floor:   "url('/assets/sprites/landing/library/book_3_floor.png')",
+      pickup:  "url('/assets/sprites/landing/library/book_3_pickup.png')",
+      open:    "url('/assets/sprites/landing/library/book_3_open.png')",
+      display: "url('/assets/sprites/landing/library/book_3_display.png')",
     },
   } as const;
 
@@ -148,7 +154,7 @@ export default function LibraryPage() {
           style={{
             position: "absolute",
             top: "68%",
-            left: "45%",
+            left: "43%",
             transform: "translate(-50%, -50%)",
             width: FRAME,
             height: FRAME,
@@ -199,8 +205,8 @@ export default function LibraryPage() {
           <div
             style={{
               position: "absolute",
-              top: "78%",
-              left: "52%",
+              top: "80%",
+              left: "45%",
               transform: "translate(-50%, -50%)",
               width: BOOK_FLOOR_SIZE,
               height: BOOK_FLOOR_SIZE,
@@ -217,8 +223,8 @@ export default function LibraryPage() {
           <div
             style={{
               position: "absolute",
-              top: "80%",
-              left: "56%",
+              top: "85%",
+              left: "35%",
               transform: "translate(-50%, -50%)",
               width: BOOK_FLOOR_SIZE,
               height: BOOK_FLOOR_SIZE,
@@ -229,6 +235,24 @@ export default function LibraryPage() {
               cursor: "pointer",
             }}
             onClick={() => pickUp(2)}
+          />
+        )}
+        {(bookState === "floor" || activeBook !== 3) && (
+          <div
+            style={{
+              position: "absolute",
+              top: "82%",
+              left: "55%",
+              transform: "translate(-50%, -50%)",
+              width: BOOK_FLOOR_SIZE,
+              height: BOOK_FLOOR_SIZE,
+              backgroundImage: BOOK_ASSETS[3].floor,
+              backgroundSize: `${BOOK_FLOOR_SIZE}px ${BOOK_FLOOR_SIZE}px`,
+              backgroundRepeat: "no-repeat",
+              imageRendering: "pixelated",
+              cursor: "pointer",
+            }}
+            onClick={() => pickUp(3)}
           />
         )}
       </div>
@@ -284,8 +308,8 @@ export default function LibraryPage() {
             <div
               style={{
                 position: "relative",
-                width: "90vmin",
-                height: "67.5vmin",
+                width: "100vmin",
+                height: "75vmin",
                 backgroundImage: BOOK_ASSETS[activeBook].display,
                 backgroundSize: "100% 100%",
                 backgroundRepeat: "no-repeat",
