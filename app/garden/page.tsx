@@ -29,15 +29,12 @@ I pray that as you pour into others, that Christ sustains you and gives you rest
 Jeshua
 `;
 
-const WATERING_CAN_TEXT = `Dear Bailey,
+const WATERING_CAN_TEXT = `Dear Bailey, 
 
-Remember to keep watering the plants in your garden. Even when it feels like nothing is changing, all the love, patience, and care you put in is helping something beautiful grow.
+Remember to keep watering the plants in your garden.
+As life begins to get tedious and tiring, don’t forget to invest in the things that matter. In this period of life where God has put you in a challenging situation, I pray that you grow in the way He desires you to.
+One day, you'll look around and realize you've built a beautiful garden. I'm so proud of you, always. 
 
-One day, you'll look around and realize you've built a beautiful garden.
-
-I'm so proud of you, always.
-
-With love,
 Jeshua`;
 
 const FLOWER_POTS_TEXT = `Dear Bailey,

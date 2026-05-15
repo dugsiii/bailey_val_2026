@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { assetUrl } from "@/lib/asset-paths";
+import { useState, useEffect, useRef, CSSProperties } from "react";
+import { assetPath, assetUrl } from "@/lib/asset-paths";
 
 const BG_W = 1672;
 const BG_H = 941;
@@ -37,6 +37,50 @@ const BOOK_OPEN_FRAMES = 6;
 const BOOK_OPEN_FPS = 8;
 
 export default function LibraryPage() {
+  const [started, setStarted] = useState(false);
+  const [muted, setMuted] = useState(false);
+  const [muteHover, setMuteHover] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    const audio = new Audio(assetPath("/assets/room_bgmusic.ogg"));
+    audio.loop = true;
+    audio.volume = 0.5;
+    audioRef.current = audio;
+    return () => { audio.pause(); audio.src = ""; };
+  }, []);
+
+  const handleStart = () => {
+    audioRef.current?.play();
+    setStarted(true);
+  };
+
+  const toggleMute = () => {
+    if (!audioRef.current) return;
+    audioRef.current.muted = !muted;
+    setMuted(m => !m);
+  };
+
+  const muteButtonStyle: CSSProperties = {
+    position: "fixed",
+    bottom: 24,
+    right: 24,
+    width: 48,
+    height: 48,
+    borderRadius: "50%",
+    background: muteHover ? "rgba(255,255,255,0.25)" : "rgba(255,255,255,0.12)",
+    border: "2px solid rgba(255,255,255,0.4)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    cursor: "pointer",
+    fontSize: 22,
+    transition: "background 0.2s, transform 0.2s",
+    transform: muteHover ? "scale(1.15)" : "scale(1)",
+    zIndex: 999,
+    userSelect: "none",
+  };
+
   const [scale, setScale] = useState(1);
   useEffect(() => {
     const update = () =>
@@ -256,6 +300,27 @@ export default function LibraryPage() {
             onClick={() => pickUp(3)}
           />
         )}
+      </div>
+
+      {!started && (
+        <div
+          className="absolute inset-0 flex items-center justify-center cursor-pointer"
+          style={{ background: "rgba(0,0,0,0.45)", zIndex: 20 }}
+          onClick={handleStart}
+        >
+          <p className="text-white text-2xl tracking-widest select-none" style={{ animation: "float 2.4s ease-in-out infinite" }}>
+            click anywhere
+          </p>
+        </div>
+      )}
+
+      <div
+        style={muteButtonStyle}
+        onClick={toggleMute}
+        onMouseEnter={() => setMuteHover(true)}
+        onMouseLeave={() => setMuteHover(false)}
+      >
+        {muted ? "🔇" : "🔊"}
       </div>
 
       {/* book overlay — pickup / opening / open */}
