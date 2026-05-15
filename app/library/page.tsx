@@ -37,7 +37,6 @@ const BOOK_OPEN_FRAMES = 6;
 const BOOK_OPEN_FPS = 8;
 
 export default function LibraryPage() {
-  const [started, setStarted] = useState(false);
   const [muted, setMuted] = useState(false);
   const [muteHover, setMuteHover] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -47,13 +46,9 @@ export default function LibraryPage() {
     audio.loop = true;
     audio.volume = 0.5;
     audioRef.current = audio;
+    audio.play().catch(() => {});
     return () => { audio.pause(); audio.src = ""; };
   }, []);
-
-  const handleStart = () => {
-    audioRef.current?.play();
-    setStarted(true);
-  };
 
   const toggleMute = () => {
     if (!audioRef.current) return;
@@ -301,18 +296,6 @@ export default function LibraryPage() {
           />
         )}
       </div>
-
-      {!started && (
-        <div
-          className="absolute inset-0 flex items-center justify-center cursor-pointer"
-          style={{ background: "rgba(0,0,0,0.45)", zIndex: 20 }}
-          onClick={handleStart}
-        >
-          <p className="text-white text-2xl tracking-widest select-none" style={{ animation: "float 2.4s ease-in-out infinite" }}>
-            click anywhere
-          </p>
-        </div>
-      )}
 
       <div
         style={muteButtonStyle}
